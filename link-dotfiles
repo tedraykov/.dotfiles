@@ -1,0 +1,49 @@
+#!/usr/bin/env python3
+
+import os
+from pathlib import Path
+
+# Define the source -> destination mapping
+SYMLINKS = {
+    "nvim": Path.home() / ".config" / "nvim",
+    "tmux/.tmux.conf": Path.home() / ".tmux.conf",
+    "zsh/.zshrc": Path.home() / ".zshrc",
+    "tmux/tmux-attach": Path.home() / ".local" / "bin" / "tmux-attach",
+    "tmux/tmux-sessionizer": Path.home() / ".local" / "bin" / "tmux-sessionizer",
+}
+
+REPO_ROOT = Path(__file__).resolve().parent
+
+
+def create_symlink(source, target):
+    if target.exists() or target.is_symlink():
+        if target.is_symlink() and target.resolve() == source.resolve():
+            print(f"✔ Already linked: {target}")
+            return
+        else:
+            print(f"⚠ Replacing existing file: {target}")
+            if target.is_dir() and not target.is_symlink():
+                for child in target.iterdir():
+                    print(f"  - {child}")
+            (
+                target.unlink()
+                if target.is_file() or target.is_symlink()
+                else os.remove(target)
+            )
+    # Ensure parent directory exists
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.symlink_to(source)
+    print(f"🔗 Linked: {target} -> {source}")
+
+
+def main():
+    for src, dest in SYMLINKS.items():
+        source_path = REPO_ROOT / src
+        if not source_path.exists():
+            print(f"❌ Missing source: {source_path}")
+            continue
+        create_symlink(source_path, dest)
+
+
+if __name__ == "__main__":
+    main()
