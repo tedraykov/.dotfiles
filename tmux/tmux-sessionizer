@@ -3,7 +3,7 @@
 if [[ $# -eq 1 ]]; then
     selected=$1
 else
-    selected=$(fd --type d --max-depth 2 --min-depth 1 . ~/dev | fzf)
+    selected=$(fd --type d --max-depth 2 --min-depth 1 . ~/dev | sed 's:/*$::' | fzf)
 fi
 
 if [[ -z $selected ]]; then

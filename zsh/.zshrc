@@ -128,6 +128,7 @@ eval "$(pyenv init -)"
 
 alias vim=nvim
 bindkey -s ^f "tmux-sessionizer\n"
+bindkey -s ^t "tmux-attach\n"
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
@@ -137,7 +138,7 @@ export PATH="$HOME/go/bin:$PATH"
 
 export LDFLAGS="-L/opt/homebrew/opt/openblas/lib"
 export CPPFLAGS="-I/opt/homebrew/opt/openblas/include"
-eval "$(rbenv init -)"
+# eval "$(rbenv init -)"
 
 # ruby
 export GEM_HOME=/Users/tedraykov/.gem/ruby/3.2.0
