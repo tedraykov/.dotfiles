@@ -5,6 +5,7 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
+
 # If you come from bash you might have to change your $PATH.
 export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 
@@ -165,3 +166,13 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 
 # flutter
 PATH=$HOME/dev/flutter/bin:$PATH
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/teodor.raykov/gcloud/path.zsh.inc' ]; then . '/Users/teodor.raykov/gcloud/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/teodor.raykov/gcloud/completion.zsh.inc' ]; then . '/Users/teodor.raykov/gcloud/completion.zsh.inc'; fi
+
+complete -C '/opt/homebrew/bin/aws_completer' aws
+
+source <(fzf --zsh)
