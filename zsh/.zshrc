@@ -130,6 +130,8 @@ eval "$(pyenv init -)"
 alias vim=nvim
 bindkey -s ^f "tmux-sessionizer\n"
 bindkey -s ^t "tmux-attach\n"
+bindkey -s ^w "exit\n"
+bindkey -s ^v "vim .\n"
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
@@ -176,3 +178,4 @@ if [ -f '/Users/teodor.raykov/gcloud/completion.zsh.inc' ]; then . '/Users/teodo
 complete -C '/opt/homebrew/bin/aws_completer' aws
 
 source <(fzf --zsh)
+export FZF_DEFAULT_OPTS='--tmux'

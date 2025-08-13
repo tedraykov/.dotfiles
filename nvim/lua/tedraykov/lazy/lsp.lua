@@ -91,7 +91,6 @@ return {
 				"docker_compose_language_service",
 				"dockerls",
 				"gopls",
-				"grammarly",
 				"helm_ls",
 				"terraformls",
 				"yamlls",
