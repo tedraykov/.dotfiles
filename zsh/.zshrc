@@ -179,3 +179,8 @@ complete -C '/opt/homebrew/bin/aws_completer' aws
 
 source <(fzf --zsh)
 export FZF_DEFAULT_OPTS='--tmux'
+export FZF_CTRL_T_OPTS=''
+
+export LUA_PATH='/opt/homebrew/Cellar/luarocks/3.12.2/share/lua/5.1/?.lua;/opt/homebrew/share/lua/5.1/?.lua;/opt/homebrew/share/lua/5.1/?/init.lua;/opt/homebrew/lib/lua/5.1/?.lua;/opt/homebrew/lib/lua/5.1/?/init.lua;./?.lua;./?/init.lua;/Users/teodor.raykov/.luarocks/share/lua/5.1/?.lua;/Users/teodor.raykov/.luarocks/share/lua/5.1/?/init.lua'
+export LUA_CPATH='/opt/homebrew/lib/lua/5.1/?.so;/opt/homebrew/lib/lua/5.1/loadall.so;./?.so;/Users/teodor.raykov/.luarocks/lib/lua/5.1/?.so'
+export PATH='/Users/teodor.raykov/.luarocks/bin:/Users/teodor.raykov/gcloud/bin:/Users/teodor.raykov/dev/flutter/bin:/Users/teodor.raykov/.bun/bin:/Users/tedraykov/Library/pnpm:/Users/tedraykov/.gem/ruby/3.2.0/bin:/Users/teodor.raykov/go/bin:/Users/teodor.raykov/.pyenv/shims:/Users/teodor.raykov/.pyenv/bin:/Users/teodor.raykov/bin:/Users/teodor.raykov/.local/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/homebrew/bin:/Users/teodor.raykov/.cargo/bin:/Users/teodor.raykov/.docker/cli-plugins/docker-buildx:/Users/teodor.raykov/.jenv/shims:/Applications/iTerm.app/Contents/Resources/utilities:/usr/local/go/bin'

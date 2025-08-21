@@ -238,6 +238,7 @@ return {
 				"black",
 				"pylint",
 				"eslint_d",
+				"flake8",
 			},
 		})
 
