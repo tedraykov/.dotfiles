@@ -143,6 +143,10 @@ export LDFLAGS="-L/opt/homebrew/opt/openblas/lib"
 export CPPFLAGS="-I/opt/homebrew/opt/openblas/include"
 # eval "$(rbenv init -)"
 
+# java
+export PATH="$HOME/.jenv/bin:$PATH"
+eval "$(jenv init -)"
+
 # ruby
 export GEM_HOME=/Users/tedraykov/.gem/ruby/3.2.0
 export PATH=$GEM_HOME/bin:$PATH
@@ -159,10 +163,6 @@ esac
 # bun completions
 [ -s "/Users/tedraykov/.bun/_bun" ] && source "/Users/tedraykov/.bun/_bun"
 
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
-
-# bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 

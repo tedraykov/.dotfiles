@@ -235,7 +235,6 @@ return {
 				"prettierd",
 				"stylua",
 				"isort",
-				"black",
 				"pylint",
 				"eslint_d",
 				"flake8",
