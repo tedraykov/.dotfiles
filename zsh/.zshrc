@@ -20,12 +20,6 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 
 trap 'pkill -f "nvim"' SIGHUP
 
-# Set list of themes to pick from when loading at random
-# Setting this variable when ZSH_THEME=random will cause zsh to load
-# a theme from this variable instead of looking in $ZSH/themes/
-# If set to an empty array, this variable will have no effect.
-# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
-
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
 
@@ -98,6 +92,12 @@ else
   export EDITOR='nvim'
 fi
 
+alias vim=nvim
+bindkey -s ^f "tmux-sessionizer\n"
+bindkey -s ^t "tmux-attach\n"
+bindkey -s ^w "exit\n"
+bindkey -s ^v "vim .\n"
+
 # Compilation flags
 # export ARCHFLAGS="-arch $(uname -m)"
 
@@ -113,11 +113,12 @@ fi
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-export NVM_DIR="$HOME/.nvm"
-  [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
-  [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-alias p="pnpm"
+# homebrew
+export PATH="/opt/homebrew/bin:$PATH"
+
 
 # python
 alias python="python3"
@@ -127,40 +128,39 @@ export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init --path)"
 eval "$(pyenv init -)"
 
-alias vim=nvim
-bindkey -s ^f "tmux-sessionizer\n"
-bindkey -s ^t "tmux-attach\n"
-bindkey -s ^w "exit\n"
-bindkey -s ^v "vim .\n"
-
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
 # Go
 export PATH="$HOME/go/bin:$PATH"
 
+
+# Ruby
 export LDFLAGS="-L/opt/homebrew/opt/openblas/lib"
 export CPPFLAGS="-I/opt/homebrew/opt/openblas/include"
 # eval "$(rbenv init -)"
+
 
 # java
 export PATH="$HOME/.jenv/bin:$PATH"
 eval "$(jenv init -)"
 
+
 # ruby
 export GEM_HOME=/Users/tedraykov/.gem/ruby/3.2.0
 export PATH=$GEM_HOME/bin:$PATH
 
-# pnpm
+
+# javascript
+export NVM_DIR="$HOME/.nvm"
+  [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
+  [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+
+alias p="pnpm"
+
 export PNPM_HOME="/Users/tedraykov/Library/pnpm"
 case ":$PATH:" in
   *":$PNPM_HOME:"*) ;;
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
-# pnpm end
 
-# bun
-# bun completions
 [ -s "/Users/tedraykov/.bun/_bun" ] && source "/Users/tedraykov/.bun/_bun"
 
 export BUN_INSTALL="$HOME/.bun"
@@ -183,4 +183,4 @@ export FZF_CTRL_T_OPTS=''
 
 export LUA_PATH='/opt/homebrew/Cellar/luarocks/3.12.2/share/lua/5.1/?.lua;/opt/homebrew/share/lua/5.1/?.lua;/opt/homebrew/share/lua/5.1/?/init.lua;/opt/homebrew/lib/lua/5.1/?.lua;/opt/homebrew/lib/lua/5.1/?/init.lua;./?.lua;./?/init.lua;/Users/teodor.raykov/.luarocks/share/lua/5.1/?.lua;/Users/teodor.raykov/.luarocks/share/lua/5.1/?/init.lua'
 export LUA_CPATH='/opt/homebrew/lib/lua/5.1/?.so;/opt/homebrew/lib/lua/5.1/loadall.so;./?.so;/Users/teodor.raykov/.luarocks/lib/lua/5.1/?.so'
-export PATH='/Users/teodor.raykov/.luarocks/bin:/Users/teodor.raykov/gcloud/bin:/Users/teodor.raykov/dev/flutter/bin:/Users/teodor.raykov/.bun/bin:/Users/tedraykov/Library/pnpm:/Users/tedraykov/.gem/ruby/3.2.0/bin:/Users/teodor.raykov/go/bin:/Users/teodor.raykov/.pyenv/shims:/Users/teodor.raykov/.pyenv/bin:/Users/teodor.raykov/bin:/Users/teodor.raykov/.local/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/homebrew/bin:/Users/teodor.raykov/.cargo/bin:/Users/teodor.raykov/.docker/cli-plugins/docker-buildx:/Users/teodor.raykov/.jenv/shims:/Applications/iTerm.app/Contents/Resources/utilities:/usr/local/go/bin'
+export PATH=$HOME/.luarocks/bin:$PATH

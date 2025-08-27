@@ -9,6 +9,15 @@ return {
 		local null_ls = require("null-ls")
 		local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
 
+		-- 🔑 Add a global flag (default = true)
+		local format_on_save = true
+
+		-- 🔑 Add a command to toggle formatting
+		vim.api.nvim_create_user_command("ToggleFormatOnSave", function()
+			format_on_save = not format_on_save
+			print("Format on save: " .. tostring(format_on_save))
+		end, {})
+
 		local prettier_config_filenames = {
 			".prettierrc",
 			".prettierrc.json",
@@ -37,13 +46,19 @@ return {
 
 		null_ls.setup({
 			on_attach = function(client, bufnr)
-				if client.supports_method("textDocument/formatting") then
+				if client.supports_method("textDocument/formatting") and format_on_save then
 					vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
 					vim.api.nvim_create_autocmd("BufWritePre", {
 						group = augroup,
 						buffer = bufnr,
 						callback = function()
-							vim.lsp.buf.format({ async = false })
+							vim.lsp.buf.format({
+								async = false,
+								filter = function()
+									-- Only format if flag is enabled
+									return format_on_save
+								end,
+							})
 						end,
 					})
 				end
@@ -52,7 +67,9 @@ return {
 				-- Python
 				null_ls.builtins.diagnostics.mypy,
 				-- null_ls.builtins.formatting.isort,
-				null_ls.builtins.formatting.black,
+				null_ls.builtins.formatting.black.with({
+					extra_args = { "--line-length", "120" },
+				}),
 				-- JavaScript
 				require("none-ls.diagnostics.eslint_d").with({
 					condition = function(utils)
