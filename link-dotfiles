@@ -25,11 +25,7 @@ def create_symlink(source, target):
             if target.is_dir() and not target.is_symlink():
                 for child in target.iterdir():
                     print(f"  - {child}")
-            (
-                target.unlink()
-                if target.is_file() or target.is_symlink()
-                else os.remove(target)
-            )
+            (target.unlink() if target.is_file() or target.is_symlink() else os.remove(target))
     # Ensure parent directory exists
     target.parent.mkdir(parents=True, exist_ok=True)
     target.symlink_to(source)

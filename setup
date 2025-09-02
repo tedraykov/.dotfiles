@@ -1,0 +1,100 @@
+#!/usr/bin/env python3
+
+import platform
+import subprocess
+from pathlib import Path
+
+HOME = Path.home()
+ZSHRC = HOME / ".zshrc"
+
+
+def run(cmd, check=True):
+    print(f"👉 Running: {cmd}")
+    subprocess.run(cmd, shell=True, check=check)
+
+
+def append_to_zshrc():
+    pyenv_config = """
+# Pyenv setup
+export PATH="$HOME/.pyenv/bin:$PATH"
+eval "$(pyenv init --path)"
+eval "$(pyenv virtualenv-init -)"
+"""
+    if ZSHRC.exists():
+        content = ZSHRC.read_text()
+        if "pyenv init" not in content:
+            with ZSHRC.open("a") as f:
+                f.write(pyenv_config)
+    else:
+        ZSHRC.write_text(pyenv_config)
+
+
+def install_ubuntu():
+    run("sudo apt update && sudo apt upgrade -y")
+    deps = [
+        "build-essential",
+        "curl",
+        "file",
+        "git",
+        "zsh",
+        "ripgrep",
+        "fzf",
+        "neovim",
+        "libssl-dev",
+        "zlib1g-dev",
+        "libbz2-dev",
+        "libreadline-dev",
+        "libsqlite3-dev",
+        "wget",
+        "llvm",
+        "libncurses5-dev",
+        "xz-utils",
+        "tk-dev",
+        "libxml2-dev",
+        "libxmlsec1-dev",
+        "libffi-dev",
+        "liblzma-dev",
+    ]
+    run(f"sudo apt install -y {' '.join(deps)}")
+
+
+def install_macos():
+    if subprocess.run("command -v brew", shell=True).returncode != 0:
+        run('/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"')
+    run("brew install zsh ripgrep fzf neovim pyenv")
+    run("$(brew --prefix)/opt/fzf/install --all --no-bash --no-fish")
+
+
+def install_ohmyzsh():
+    if not (HOME / ".oh-my-zsh").exists():
+        run(
+            'sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended'
+        )
+
+
+def install_pyenv():
+    if not (HOME / ".pyenv").exists():
+        run("curl https://pyenv.run | bash")
+
+
+def main():
+    system = platform.system()
+    print(f"Detected OS: {system}")
+
+    if system == "Linux":
+        install_ubuntu()
+    elif system == "Darwin":
+        install_macos()
+    else:
+        print("❌ Unsupported OS.")
+        return
+
+    install_ohmyzsh()
+    install_pyenv()
+    append_to_zshrc()
+
+    print("\n✅ Setup complete! Restart your shell or run: exec zsh")
+
+
+if __name__ == "__main__":
+    main()
