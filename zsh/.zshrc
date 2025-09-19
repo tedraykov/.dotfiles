@@ -6,6 +6,7 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
 fi
 
 
+TZ=UTC
 # If you come from bash you might have to change your $PATH.
 export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 
@@ -129,7 +130,7 @@ eval "$(pyenv init --path)"
 eval "$(pyenv init -)"
 
 # Go
-export PATH="$HOME/go/bin:$PATH"
+export PATH="$HOME/go/bin:/usr/local/go/bin:$PATH"
 
 
 # Ruby

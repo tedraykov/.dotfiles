@@ -30,3 +30,4 @@ vim.opt.colorcolumn = "80"
 
 vim.netrw_list_hide = "^.git$,^.DS_Store$"
 vim.netrw_sizestyle = "h"
+vim.opt.laststatus = 3

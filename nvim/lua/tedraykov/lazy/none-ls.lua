@@ -9,10 +9,10 @@ return {
 		local null_ls = require("null-ls")
 		local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
 
-		-- 🔑 Add a global flag (default = true)
+		-- Add a global flag (default = true)
 		local format_on_save = true
 
-		-- 🔑 Add a command to toggle formatting
+		-- Add a command to toggle formatting
 		vim.api.nvim_create_user_command("ToggleFormatOnSave", function()
 			format_on_save = not format_on_save
 			print("Format on save: " .. tostring(format_on_save))
@@ -46,18 +46,19 @@ return {
 
 		null_ls.setup({
 			on_attach = function(client, bufnr)
-				if client.supports_method("textDocument/formatting") and format_on_save then
+				if client.supports_method("textDocument/formatting") then
 					vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
 					vim.api.nvim_create_autocmd("BufWritePre", {
 						group = augroup,
 						buffer = bufnr,
 						callback = function()
+							if not format_on_save then
+								return
+							end
+
 							vim.lsp.buf.format({
 								async = false,
-								filter = function()
-									-- Only format if flag is enabled
-									return format_on_save
-								end,
+								timeout_ms = 2000,
 							})
 						end,
 					})
@@ -91,6 +92,10 @@ return {
 						return utils.root_has_file(prettier_config_filenames)
 					end,
 				}),
+				-- Go
+				null_ls.builtins.diagnostics.golangci_lint,
+				null_ls.builtins.formatting.goimports,
+				null_ls.builtins.formatting.gofmt,
 				-- JSON
 				require("none-ls.formatting.jq"),
 				-- General
