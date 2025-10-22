@@ -93,7 +93,12 @@ else
   export EDITOR='nvim'
 fi
 
+
+source <(fzf --zsh)
+export FZF_DEFAULT_OPTS='--tmux'
+export FZF_CTRL_T_OPTS=''
 alias vim=nvim
+
 bindkey -s ^f "tmux-sessionizer\n"
 bindkey -s ^t "tmux-attach\n"
 bindkey -s ^w "exit\n"
@@ -177,10 +182,6 @@ if [ -f '/Users/teodor.raykov/gcloud/path.zsh.inc' ]; then . '/Users/teodor.rayk
 if [ -f '/Users/teodor.raykov/gcloud/completion.zsh.inc' ]; then . '/Users/teodor.raykov/gcloud/completion.zsh.inc'; fi
 
 complete -C '/opt/homebrew/bin/aws_completer' aws
-
-source <(fzf --zsh)
-export FZF_DEFAULT_OPTS='--tmux'
-export FZF_CTRL_T_OPTS=''
 
 export LUA_PATH='/opt/homebrew/Cellar/luarocks/3.12.2/share/lua/5.1/?.lua;/opt/homebrew/share/lua/5.1/?.lua;/opt/homebrew/share/lua/5.1/?/init.lua;/opt/homebrew/lib/lua/5.1/?.lua;/opt/homebrew/lib/lua/5.1/?/init.lua;./?.lua;./?/init.lua;/Users/teodor.raykov/.luarocks/share/lua/5.1/?.lua;/Users/teodor.raykov/.luarocks/share/lua/5.1/?/init.lua'
 export LUA_CPATH='/opt/homebrew/lib/lua/5.1/?.so;/opt/homebrew/lib/lua/5.1/loadall.so;./?.so;/Users/teodor.raykov/.luarocks/lib/lua/5.1/?.so'

@@ -26,7 +26,7 @@ vim.opt.isfname:append("@-@")
 
 vim.opt.updatetime = 50
 
-vim.opt.colorcolumn = "80"
+vim.opt.colorcolumn = "120"
 
 vim.netrw_list_hide = "^.git$,^.DS_Store$"
 vim.netrw_sizestyle = "h"

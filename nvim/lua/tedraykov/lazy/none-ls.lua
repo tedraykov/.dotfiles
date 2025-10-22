@@ -102,6 +102,13 @@ return {
 				null_ls.builtins.code_actions.refactoring,
 				null_ls.builtins.formatting.stylua,
 			},
+			should_attach = function(bufnr)
+				local name = vim.api.nvim_buf_get_name(bufnr) or ""
+				if name:match("^fugitive://") then
+					return false
+				end
+				return true
+			end,
 		})
 	end,
 }
