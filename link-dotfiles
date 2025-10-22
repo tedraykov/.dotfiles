@@ -8,6 +8,7 @@ SYMLINKS = {
     "nvim": Path.home() / ".config" / "nvim",
     "tmux/.tmux.conf": Path.home() / ".tmux.conf",
     "zsh/.zshrc": Path.home() / ".zshrc",
+    "aerospace/.aerospace.toml": Path.home() / ".aerospace.toml",
     "tmux/tmux-attach": Path.home() / ".local" / "bin" / "tmux-attach",
     "tmux/tmux-sessionizer": Path.home() / ".local" / "bin" / "tmux-sessionizer",
 }
