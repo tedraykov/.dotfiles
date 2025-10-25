@@ -71,11 +71,10 @@ return {
 			dap_python.test_runner = "pytest"
 
       local sign = vim.fn.sign_define
-
-      sign("DapBreakpoint", { text = "●", texthl = "DapBreakpoint", linehl = "", numhl = ""})
-      sign("DapBreakpointCondition", { text = "●", texthl = "DapBreakpointCondition", linehl = "", numhl = ""})
-      sign("DapLogPoint", { text = "◆", texthl = "DapLogPoint", linehl = "", numhl = ""})
-      sign('DapStopped', { text='', texthl='DapStopped', linehl='DapStopped', numhl= 'DapStopped' })
+      sign("DapBreakpoint", { text = "●", texthl = "DiagnosticError" })
+      sign("DapBreakpointCondition", { text = "●", texthl = "DiagnosticWarn" })
+      sign("DapLogPoint", { text = "◆", texthl = "DiagnosticInfo" })
+      sign("DapStopped", { text = "", texthl = "DiagnosticOk" })
 
 			table.insert(dap.configurations.python, {
 				type = "python",
@@ -135,12 +134,16 @@ return {
 
 			-- Pytest file
 			vim.keymap.set("n", "<leader>dm", function()
+        dapui.open()
+        dapui.float_element("console", { enter = true })
 				require("dap-python").test_method()
 			end, opts)
 
 			-- Run tests in current file
 			vim.keymap.set("n", "<leader>df", function()
-				require("dap-python").test_file()
+        dapui.open()
+        dapui.float_element("console", { enter = true })
+				require("dap-python").test_class()
 			end, opts)
 
 			vim.keymap.set("n", "<leader>da", function()
