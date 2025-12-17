@@ -1,9 +1,25 @@
 #!/usr/bin/env bash
 
+FAVORITES=(
+  "$HOME/dev/redis/Redis-Enterprise/cnm"
+  "$HOME/dev/redis/Redis-Enterprise/cnm-go"
+  "$HOME/dev/redis/Redis-Enterprise/rl-automation"
+)
+
 if [[ $# -eq 1 ]]; then
     selected=$1
 else
-    selected=$(fd --type d --max-depth 2 --min-depth 1 . ~/dev | sed 's:/*$::' | fzf)
+    selected=$(
+      {
+        printf '%s\n' "${FAVORITES[@]}"
+
+        # 2) fd search results
+        fd --type d --max-depth 2 --min-depth 1 . ~/dev
+      } \
+      | sed 's:/*$::' \
+      | awk '!seen[$0]++' \
+      | fzf
+    )
 fi
 
 if [[ -z $selected ]]; then
