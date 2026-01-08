@@ -13,22 +13,6 @@ def run(cmd, check=True):
     subprocess.run(cmd, shell=True, check=check)
 
 
-def append_to_zshrc():
-    pyenv_config = """
-# Pyenv setup
-export PATH="$HOME/.pyenv/bin:$PATH"
-eval "$(pyenv init --path)"
-eval "$(pyenv virtualenv-init -)"
-"""
-    if ZSHRC.exists():
-        content = ZSHRC.read_text()
-        if "pyenv init" not in content:
-            with ZSHRC.open("a") as f:
-                f.write(pyenv_config)
-    else:
-        ZSHRC.write_text(pyenv_config)
-
-
 def install_ubuntu():
     run("sudo apt update && sudo apt upgrade -y")
     deps = [
@@ -56,6 +40,8 @@ def install_ubuntu():
         "liblzma-dev",
     ]
     run(f"sudo apt install -y {' '.join(deps)}")
+    if not (HOME / ".pyenv").exists():
+        run("curl https://pyenv.run | bash")
 
 
 def install_macos():
@@ -72,9 +58,17 @@ def install_ohmyzsh():
         )
 
 
-def install_pyenv():
-    if not (HOME / ".pyenv").exists():
-        run("curl https://pyenv.run | bash")
+def install_zsh_plugin(url, name):
+    if (HOME / f".oh-my-zsh/custom/plugins/{name}").exists():
+        print(f"Plugin {name} already installed")
+        return
+    print(f"Installing zsh plugin {name}")
+    run(f"git clone {url} {HOME}/.oh-my-zsh/custom/plugins/{name}")
+
+
+def setup_zsh_plugins():
+    install_zsh_plugin("https://github.com/davidparsson/zsh-pyenv-lazy.git", "pyenv-lazy")
+    install_zsh_plugin("https://github.com/lukechilds/zsh-nvm", "zsh-nvm")
 
 
 def main():
@@ -90,8 +84,7 @@ def main():
         return
 
     install_ohmyzsh()
-    install_pyenv()
-    append_to_zshrc()
+    setup_zsh_plugins()
 
     print("\n✅ Setup complete! Restart your shell or run: exec zsh")
 
