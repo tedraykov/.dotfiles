@@ -129,18 +129,19 @@ return {
 						name = "Go Attach: container (delve)",
 						mode = "remote",
 						request = "attach",
+						host = "127.0.0.1",
 						port = function()
 							local port_string = vim.fn.input("Port [2345]: ")
 							local port = port_string ~= "" and tonumber(port_string) or 2345
 							return port
 						end,
-						pathMappings = function()
+						substitutePath = function()
 							local remote_path = vim.fn.input("Remote path [/workspace]: ")
 							local path = remote_path ~= "" and remote_path or "/workspace"
 							return {
 								{
-									localRoot = project_root(),
-									remoteRoot = path,
+									from = project_root(),
+									to = path,
 								},
 							}
 						end,
@@ -163,12 +164,36 @@ return {
 			-- GO SETUP
 			-- ============================================================
 			-- Adapter for REMOTE Delve (connects to existing DAP server in container)
-			-- This does NOT launch a local dlv - it connects directly to port 2345
-			-- dap.adapters.go_remote_attach = {
-			-- 	type = "server",
-			-- 	host = "127.0.0.1",
-			-- 	port = 2345,
-			-- }
+			-- This does NOT launch a local dlv - it connects directly to the port
+			dap.adapters.go = function(callback, config)
+				if config.mode == "remote" then
+					callback({
+						type = "server",
+						host = config.host or "127.0.0.1",
+						port = config.port,
+					})
+				else
+					-- For local debugging, use the default delve adapter
+					local handle
+					local pid_or_err
+					local port = 38697
+					local opts = {
+						args = { "dap", "-l", "127.0.0.1:" .. port },
+						detached = true,
+					}
+					handle, pid_or_err = vim.loop.spawn("dlv", opts, function(code)
+						handle:close()
+					end)
+					if not handle then
+						vim.notify("Error launching delve: " .. tostring(pid_or_err), vim.log.levels.ERROR)
+						return
+					end
+					vim.defer_fn(function()
+						callback({ type = "server", host = "127.0.0.1", port = port })
+					end, 100)
+				end
+			end
+
 			dap_go.setup({
 				-- Additional dap configurations can be added.
 				dap_configurations = {
