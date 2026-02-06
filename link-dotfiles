@@ -11,6 +11,8 @@ SYMLINKS = {
     "aerospace/.aerospace.toml": Path.home() / ".aerospace.toml",
     "tmux/tmux-attach": Path.home() / ".local" / "bin" / "tmux-attach",
     "tmux/tmux-sessionizer": Path.home() / ".local" / "bin" / "tmux-sessionizer",
+    "iterm": Path.home() / ".config" / "iterm",
+    "iterm/profile.json": Path.home() / "Library" / "Application Support" / "iTerm2" / "DynamicProfiles" / "profile.json",
 }
 
 REPO_ROOT = Path(__file__).resolve().parent
