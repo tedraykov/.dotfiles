@@ -1,6 +1,7 @@
 {
   "Profiles": [
     {
+      "Rewritable": true,
       "Ansi 7 Color (Light)": {
         "Red Component": 0.6705882549285889,
         "Color Space": "sRGB",
@@ -328,7 +329,7 @@
         "Red Component": 0.7333333492279053
       },
       "Name": "Default",
-      "Transparency": 0,
+      "Transparency": 0.02,
       "Horizontal Spacing": 1,
       "Thin Strokes": 0,
       "Cursor Color (Dark)": {
@@ -457,7 +458,7 @@
       "Shortcut": "",
       "Mouse Reporting": true,
       "Tags": [],
-      "Blur Radius": 9.668953683035715,
+      "Blur Radius": 20,
       "Ansi 6 Color (Light)": {
         "Red Component": 0.33725491166114807,
         "Color Space": "sRGB",
