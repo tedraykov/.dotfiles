@@ -131,8 +131,8 @@ return {
 						request = "attach",
 						host = "127.0.0.1",
 						port = function()
-							local port_string = vim.fn.input("Port [2345]: ")
-							local port = port_string ~= "" and tonumber(port_string) or 2345
+							local port_string = vim.fn.input("Port [5678]: ")
+							local port = port_string ~= "" and tonumber(port_string) or 5678
 							return port
 						end,
 						substitutePath = function()

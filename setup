@@ -17,7 +17,9 @@ def install_ubuntu():
     run("sudo apt update && sudo apt upgrade -y")
     deps = [
         "build-essential",
+        "bat",
         "curl",
+        "eza",
         "file",
         "git",
         "zsh",
@@ -47,7 +49,7 @@ def install_ubuntu():
 def install_macos():
     if subprocess.run("command -v brew", shell=True).returncode != 0:
         run('/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"')
-    run("brew install zsh ripgrep fzf neovim pyenv")
+    run("brew install zsh ripgrep fzf neovim pyenv eza bat")
     run("$(brew --prefix)/opt/fzf/install --all --no-bash --no-fish")
 
 

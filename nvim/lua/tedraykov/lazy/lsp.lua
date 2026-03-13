@@ -75,6 +75,7 @@ return {
 			automatic_enable = true,
 			ensure_installed = {
 				"ts_ls",
+				"harper_ls",
 				"html",
 				"cssls",
 				"tailwindcss",
@@ -131,6 +132,26 @@ return {
 				},
 			},
 			single_file_support = false,
+		})
+
+		vim.lsp.config("harper_ls", {
+			settings = {
+				["harper-ls"] = {
+					linters = {
+						SpellCheck = true,
+						SpelledNumbers = false,
+						AnA = false,
+						SentenceCapitalization = false,
+						UnclosedQuotes = false,
+						WrongQuotes = false,
+						LongSentences = false,
+						RepeatedWords = true,
+						Spaces = true,
+						Matcher = true,
+						CorrectNumberSuffix = false,
+					},
+				},
+			},
 		})
 
 		-- ["yamlls"] = function()

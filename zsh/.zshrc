@@ -13,6 +13,13 @@ export ZSH="$HOME/.oh-my-zsh"
 
 ZSH_THEME="powerlevel10k/powerlevel10k"
 
+# Which plugins would you like to load?
+# Standard plugins can be found in $ZSH/plugins/
+# Custom plugins may be added to $ZSH_CUSTOM/plugins/
+# Example format: plugins=(rails git textmate ruby lighthouse)
+# Add wisely, as too many plugins slow down shell startup.
+plugins=(git pyenv-lazy zsh-nvm)
+
 trap 'pkill -f "nvim"' SIGHUP
 
 source $ZSH/oh-my-zsh.sh
@@ -28,6 +35,16 @@ source $ZSH/oh-my-zsh.sh
 export FZF_DEFAULT_OPTS='--tmux'
 export FZF_CTRL_T_OPTS=''
 alias vim=nvim
+
+if command -v eza >/dev/null 2>&1; then
+  alias ls='eza'
+fi
+
+if command -v bat >/dev/null 2>&1; then
+  alias cat='bat --paging=never'
+elif command -v batcat >/dev/null 2>&1; then
+  alias cat='batcat --paging=never'
+fi
 
 bindkey -s ^f "tmux-sessionizer\n"
 bindkey -s ^t "tmux-attach\n"
@@ -61,8 +78,8 @@ alias python="python3"
 
 
 # Go
-export PATH="$HOME/go/bin:/usr/local/go/bin:$PATH"
-
+export GOENV_DIR="$HOME/.gvm/gos/go1.25.7"
+export GOROOT="$GOENV_DIR"
 
 # Ruby
 export LDFLAGS="-L/opt/homebrew/opt/openblas/lib"
@@ -72,7 +89,7 @@ export CPPFLAGS="-I/opt/homebrew/opt/openblas/include"
 
 # java
 export PATH="$HOME/.jenv/bin:$PATH"
-# eval "$(jenv init -)"
+eval "$(jenv init -)"
 
 
 # ruby
@@ -96,13 +113,6 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 # flutter
 PATH=$HOME/dev/flutter/bin:$PATH
 
-# Which plugins would you like to load?
-# Standard plugins can be found in $ZSH/plugins/
-# Custom plugins may be added to $ZSH_CUSTOM/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
-plugins=(git pyenv-lazy zsh-nvm)
-
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '/Users/teodor.raykov/gcloud/path.zsh.inc' ]; then . '/Users/teodor.raykov/gcloud/path.zsh.inc'; fi
 
@@ -114,3 +124,5 @@ complete -C '/opt/homebrew/bin/aws_completer' aws
 export LUA_PATH='/opt/homebrew/Cellar/luarocks/3.12.2/share/lua/5.1/?.lua;/opt/homebrew/share/lua/5.1/?.lua;/opt/homebrew/share/lua/5.1/?/init.lua;/opt/homebrew/lib/lua/5.1/?.lua;/opt/homebrew/lib/lua/5.1/?/init.lua;./?.lua;./?/init.lua;/Users/teodor.raykov/.luarocks/share/lua/5.1/?.lua;/Users/teodor.raykov/.luarocks/share/lua/5.1/?/init.lua'
 export LUA_CPATH='/opt/homebrew/lib/lua/5.1/?.so;/opt/homebrew/lib/lua/5.1/loadall.so;./?.so;/Users/teodor.raykov/.luarocks/lib/lua/5.1/?.so'
 export PATH=$HOME/.luarocks/bin:$PATH
+
+[[ -s "/Users/teodor.raykov/.gvm/scripts/gvm" ]] && source "/Users/teodor.raykov/.gvm/scripts/gvm"
