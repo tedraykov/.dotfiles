@@ -72,36 +72,38 @@ bindkey -s ^v "vim .\n"
 # homebrew
 export PATH="/opt/homebrew/bin:$PATH"
 
-
 # python
 alias python="python3"
 
+# go
+export GVM_ROOT="$HOME/.gvm"
 
-# Go
-export GOENV_DIR="$HOME/.gvm/gos/go1.25.7"
-export GOROOT="$GOENV_DIR"
+_load_gvm() {
+  unset -f gvm go gofmt
+  [[ -s "$GVM_ROOT/scripts/gvm" ]] && source "$GVM_ROOT/scripts/gvm"
+  hash -r 2>/dev/null
+}
+
+gvm()   { _load_gvm; gvm "$@"; }
+go()    { _load_gvm; go "$@"; }
+gofmt() { _load_gvm; gofmt "$@"; }
 
 # Ruby
 export LDFLAGS="-L/opt/homebrew/opt/openblas/lib"
 export CPPFLAGS="-I/opt/homebrew/opt/openblas/include"
+export GEM_HOME=/Users/tedraykov/.gem/ruby/3.2.0
+export PATH=$GEM_HOME/bin:$PATH
 # eval "$(rbenv init -)"
-
 
 # java
 export PATH="$HOME/.jenv/bin:$PATH"
-eval "$(jenv init -)"
-
-
-# ruby
-export GEM_HOME=/Users/tedraykov/.gem/ruby/3.2.0
-export PATH=$GEM_HOME/bin:$PATH
-
+# eval "$(jenv init -)"
 
 # javascript
 export NVM_LAZY_LOAD=true
 alias p="pnpm"
 
-export PNPM_HOME="/Users/tedraykov/Library/pnpm"
+export PNPM_HOME="$HOME/Library/pnpm"
 case ":$PATH:" in
   *":$PNPM_HOME:"*) ;;
   *) export PATH="$PNPM_HOME:$PATH" ;;
@@ -114,15 +116,13 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 PATH=$HOME/dev/flutter/bin:$PATH
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/teodor.raykov/gcloud/path.zsh.inc' ]; then . '/Users/teodor.raykov/gcloud/path.zsh.inc'; fi
+if [ -f "$HOME/gcloud/path.zsh.inc" ]; then . "$HOME/gcloud/path.zsh.inc"; fi
 
 # The next line enables shell command completion for gcloud.
-if [ -f '/Users/teodor.raykov/gcloud/completion.zsh.inc' ]; then . '/Users/teodor.raykov/gcloud/completion.zsh.inc'; fi
+if [ -f "$HOME/gcloud/completion.zsh.inc" ]; then . "$HOME/gcloud/completion.zsh.inc"; fi
 
 complete -C '/opt/homebrew/bin/aws_completer' aws
 
 export LUA_PATH='/opt/homebrew/Cellar/luarocks/3.12.2/share/lua/5.1/?.lua;/opt/homebrew/share/lua/5.1/?.lua;/opt/homebrew/share/lua/5.1/?/init.lua;/opt/homebrew/lib/lua/5.1/?.lua;/opt/homebrew/lib/lua/5.1/?/init.lua;./?.lua;./?/init.lua;/Users/teodor.raykov/.luarocks/share/lua/5.1/?.lua;/Users/teodor.raykov/.luarocks/share/lua/5.1/?/init.lua'
 export LUA_CPATH='/opt/homebrew/lib/lua/5.1/?.so;/opt/homebrew/lib/lua/5.1/loadall.so;./?.so;/Users/teodor.raykov/.luarocks/lib/lua/5.1/?.so'
 export PATH=$HOME/.luarocks/bin:$PATH
-
-[[ -s "/Users/teodor.raykov/.gvm/scripts/gvm" ]] && source "/Users/teodor.raykov/.gvm/scripts/gvm"

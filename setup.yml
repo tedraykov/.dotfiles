@@ -1,0 +1,230 @@
+
+- name: Provision Workstation
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  vars:
+    # Modern fact syntax
+    home: "{{ ansible_facts['env']['HOME'] }}"
+    oh_my_zsh: "{{ ansible_facts['env']['HOME'] }}/.oh-my-zsh"
+    dotfiles:
+      - { src: "nvim", dest: "{{ home }}/.config/nvim" }
+      - { src: "tmux/.tmux.conf", dest: "{{ home }}/.tmux.conf" }
+      - { src: "zsh/.zshrc", dest: "{{ home }}/.zshrc" }
+      - { src: "tmux/tmux-attach", dest: "{{ home }}/.local/bin/tmux-attach" }
+      - { src: "tmux/tmux-sessionizer", dest: "{{ home }}/.local/bin/tmux-sessionizer" }
+      - { src: "aerospace/.aerospace.toml", dest: "{{ home }}/.aerospace.toml", os: "Darwin" }
+      - { src: "iterm", dest: "{{ home }}/.config/iterm", os: "Darwin" }
+      - { src: "iterm/profile.json", dest: "{{ home }}/Library/Application Support/iTerm2/DynamicProfiles/profile.json", os: "Darwin" }
+
+  tasks:
+    # ==========================================
+    # 1. OS-Specific Package Management
+    # ==========================================
+    - name: Ubuntu | Install packages and build dependencies
+      become: true
+      ansible.builtin.apt:
+        name:
+          - build-essential
+          - bat
+          - curl
+          - eza
+          - fd-find
+          - file
+          - git
+          - tmux
+          - zsh
+          - ripgrep
+          - fzf
+          - neovim
+          - libssl-dev
+          - zlib1g-dev
+          - libbz2-dev
+          - libreadline-dev
+          - libsqlite3-dev
+          - wget
+          - llvm
+          - libncurses5-dev
+          - xz-utils
+          - tk-dev
+          - libxml2-dev
+          - libxmlsec1-dev
+          - libffi-dev
+          - liblzma-dev
+          - bison
+          - xclip
+        state: present
+        update_cache: yes
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Ubuntu | Symlink fdfind to fd
+      ansible.builtin.file:
+        src: /usr/bin/fdfind
+        dest: "{{ home }}/.local/bin/fd"
+        state: link
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Ubuntu | Install pyenv via installer
+      ansible.builtin.shell: curl https://pyenv.run | bash
+      args:
+        creates: "{{ home }}/.pyenv"
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: macOS | Install Homebrew packages
+      community.general.homebrew:
+        name:
+          - zsh
+          - ripgrep
+          - fd
+          - fzf
+          - neovim
+          - pyenv
+          - eza
+          - bat
+          - tmux
+          - bison
+        state: present
+        update_homebrew: yes
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: macOS | Install GUI Applications (Casks)
+      community.general.homebrew_cask:
+        name:
+          - iterm2
+        state: present
+        accept_external_apps: yes
+      when: ansible_facts['os_family'] == "Darwin"
+
+    - name: macOS | Run fzf install script
+      ansible.builtin.command: "$(brew --prefix)/opt/fzf/install --all --no-bash --no-fish"
+      args:
+        creates: "{{ home }}/.fzf.zsh"
+      when: ansible_facts['os_family'] == "Darwin"
+
+    # ==========================================
+    # 2. Shell & Terminal Setup
+    # ==========================================
+    - name: Clone Oh-My-Zsh
+      ansible.builtin.git:
+        repo: 'https://github.com/ohmyzsh/ohmyzsh.git'
+        dest: "{{ oh_my_zsh }}"
+        depth: 1
+
+    - name: Clone Zsh Plugins
+      ansible.builtin.git:
+        repo: "{{ item.url }}"
+        dest: "{{ oh_my_zsh }}/custom/plugins/{{ item.name }}"
+      loop:
+        - { name: 'pyenv-lazy', url: 'https://github.com/davidparsson/zsh-pyenv-lazy.git' }
+        - { name: 'zsh-nvm', url: 'https://github.com/lukechilds/zsh-nvm.git' }
+
+    - name: Clone Powerlevel10k Theme
+      ansible.builtin.git:
+        repo: 'https://github.com/romkatv/powerlevel10k.git'
+        dest: "{{ oh_my_zsh }}/custom/themes/powerlevel10k"
+        depth: 1
+
+    - name: Clone TPM (Tmux Plugin Manager)
+      ansible.builtin.git:
+        repo: 'https://github.com/tmux-plugins/tpm'
+        dest: "{{ home }}/.tmux/plugins/tpm"
+        depth: 1
+
+    # ==========================================
+    # 3. Fonts Setup
+    # ==========================================
+    - name: Set Font Directory Path
+      ansible.builtin.set_fact:
+        font_dir: "{{ (ansible_facts['os_family'] == 'Darwin') | ternary(home + '/Library/Fonts', home + '/.local/share/fonts') }}"
+
+    - name: Ensure Font Directory Exists
+      ansible.builtin.file:
+        path: "{{ font_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Download MesloLGS NF Font
+      ansible.builtin.get_url:
+        url: 'https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf'
+        dest: "{{ font_dir }}/MesloLGS NF Regular.ttf"
+      register: font_download
+
+    - name: Linux | Refresh font cache
+      ansible.builtin.command: fc-cache -f -v
+      when: ansible_facts['os_family'] == "Debian" and font_download.changed
+
+    # ==========================================
+    # 4. Developer Tools
+    # ==========================================
+    - name: Install NVM
+      ansible.builtin.shell: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+      args:
+        creates: "{{ home }}/.nvm/nvm.sh"
+
+    - name: Install Node.js via NVM
+      ansible.builtin.shell: |
+        . "{{ home }}/.nvm/nvm.sh"
+        nvm install node
+        nvm alias default node
+      args:
+        executable: /bin/bash
+
+    - name: Clone Jenv
+      ansible.builtin.git:
+        repo: 'https://github.com/jenv/jenv.git'
+        dest: "{{ home }}/.jenv"
+
+    - name: Install GVM (Go Version Manager)
+      ansible.builtin.shell: bash < <(curl -s -S -L https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer)
+      args:
+        creates: "{{ home }}/.gvm/scripts/gvm"
+        executable: /bin/bash
+
+    - name: Install Go (via GVM) and set as default
+      ansible.builtin.shell: |
+        source "{{ home }}/.gvm/scripts/gvm"
+        gvm install go1.25.7 -B
+        gvm use go1.25.7 --default
+      args:
+        creates: "{{ home }}/.gvm/gos/go1.25.7/bin/go"
+        executable: /bin/bash
+
+    - name: Install Rust via rustup
+      ansible.builtin.shell: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+      args:
+        creates: "{{ home }}/.cargo/bin/rustc"
+
+    - name: Install Poetry (Python Package Manager)
+      ansible.builtin.shell: curl -sSL https://install.python-poetry.org | python3 -
+      args:
+        creates: "{{ home }}/.local/bin/poetry"
+
+    # ==========================================
+    # 5. Dotfiles Linking
+    # ==========================================
+    - name: Ensure parent directories for dotfiles exist
+      ansible.builtin.file:
+        path: "{{ item.dest | dirname }}"
+        state: directory
+        mode: '0755'
+      loop: "{{ dotfiles }}"
+      when: item.os is undefined or item.os == ansible_facts['os_family']
+
+    - name: Symlink dotfiles
+      ansible.builtin.file:
+        src: "{{ playbook_dir }}/{{ item.src }}"
+        dest: "{{ item.dest }}"
+        state: link
+        force: yes
+      loop: "{{ dotfiles }}"
+      when: item.os is undefined or item.os == ansible_facts['os_family']
+
+    # ==========================================
+    # 6. Post-Install Hooks
+    # ==========================================
+    - name: Install tmux plugins headlessly
+      ansible.builtin.command: "{{ home }}/.tmux/plugins/tpm/bin/install_plugins"
+      environment:
+        TMUX_PLUGIN_MANAGER_PATH: "{{ home }}/.tmux/plugins/"
+      args:
+        creates: "{{ home }}/.tmux/plugins/tmux"

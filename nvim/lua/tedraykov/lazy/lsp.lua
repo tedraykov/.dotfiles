@@ -92,6 +92,7 @@ return {
 				"terraformls",
 				"yamlls",
 				"jinja_lsp",
+				"pyright",
 			},
 		})
 
@@ -205,6 +206,7 @@ return {
 				"pylint",
 				"eslint_d",
 				"flake8",
+				"goimports",
 			},
 		})
 

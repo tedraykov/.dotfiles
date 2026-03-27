@@ -1,95 +1,53 @@
-#!/usr/bin/env python3
+#!/usr/bin/env bash
 
-import platform
-import subprocess
-from pathlib import Path
+# Exit immediately if a command exits with a non-zero status
+set -e
 
-HOME = Path.home()
-ZSHRC = HOME / ".zshrc"
+echo "🚀 Bootstrapping workstation setup..."
 
+# 1. Detect the Operating System
+OS="$(uname -s)"
+echo "👉 Detected OS: $OS"
 
-def run(cmd, check=True):
-    print(f"👉 Running: {cmd}")
-    subprocess.run(cmd, shell=True, check=check)
+# 2. Install Ansible based on the OS
+if [ "$OS" = "Linux" ]; then
+    echo "📦 Installing Ansible for Ubuntu/Debian..."
+    sudo apt update -y
+    sudo apt install -y software-properties-common
+    sudo apt install -y ansible
 
+elif [ "$OS" = "Darwin" ]; then
+    echo "🍎 Checking for Homebrew..."
+    if ! command -v brew &> /dev/null; then
+        echo "📦 Installing Homebrew..."
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-def install_ubuntu():
-    run("sudo apt update && sudo apt upgrade -y")
-    deps = [
-        "build-essential",
-        "bat",
-        "curl",
-        "eza",
-        "file",
-        "git",
-        "zsh",
-        "ripgrep",
-        "fzf",
-        "neovim",
-        "libssl-dev",
-        "zlib1g-dev",
-        "libbz2-dev",
-        "libreadline-dev",
-        "libsqlite3-dev",
-        "wget",
-        "llvm",
-        "libncurses5-dev",
-        "xz-utils",
-        "tk-dev",
-        "libxml2-dev",
-        "libxmlsec1-dev",
-        "libffi-dev",
-        "liblzma-dev",
-    ]
-    run(f"sudo apt install -y {' '.join(deps)}")
-    if not (HOME / ".pyenv").exists():
-        run("curl https://pyenv.run | bash")
+        # Make brew available in the current session for Apple Silicon/Intel
+        if [ -d "/opt/homebrew/bin" ]; then
+            eval "$(/opt/homebrew/bin/brew shellenv)"
+        else
+            eval "$(/usr/local/bin/brew shellenv)"
+        fi
+    else
+        echo "✅ Homebrew is already installed."
+    fi
 
+    echo "📦 Installing Ansible for macOS..."
+    brew install ansible
+else
+    echo "❌ Unsupported OS: $OS"
+    exit 1
+fi
 
-def install_macos():
-    if subprocess.run("command -v brew", shell=True).returncode != 0:
-        run('/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"')
-    run("brew install zsh ripgrep fzf neovim pyenv eza bat")
-    run("$(brew --prefix)/opt/fzf/install --all --no-bash --no-fish")
+# 3. Install required Ansible collections
+echo "🧩 Installing required Ansible collections..."
+ansible-galaxy collection install community.general
 
+# 4. Run the Playbook
+echo "⚙️ Running Ansible Playbook (setup.yml)..."
+echo "Note: You may be prompted for your sudo password to install system packages."
 
-def install_ohmyzsh():
-    if not (HOME / ".oh-my-zsh").exists():
-        run(
-            'sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended'
-        )
+# The -K flag tells Ansible to ask for your sudo (become) password
+ansible-playbook -i localhost, setup.yml
 
-
-def install_zsh_plugin(url, name):
-    if (HOME / f".oh-my-zsh/custom/plugins/{name}").exists():
-        print(f"Plugin {name} already installed")
-        return
-    print(f"Installing zsh plugin {name}")
-    run(f"git clone {url} {HOME}/.oh-my-zsh/custom/plugins/{name}")
-
-
-def setup_zsh_plugins():
-    install_zsh_plugin("https://github.com/davidparsson/zsh-pyenv-lazy.git", "pyenv-lazy")
-    install_zsh_plugin("https://github.com/lukechilds/zsh-nvm", "zsh-nvm")
-
-
-def main():
-    system = platform.system()
-    print(f"Detected OS: {system}")
-
-    if system == "Linux":
-        install_ubuntu()
-    elif system == "Darwin":
-        install_macos()
-    else:
-        print("❌ Unsupported OS.")
-        return
-
-    install_ohmyzsh()
-    setup_zsh_plugins()
-
-    print("\n✅ Setup complete! Restart your shell or run: exec zsh")
-
-
-if __name__ == "__main__":
-    main()
+echo "✅ Setup complete! Please restart your terminal."

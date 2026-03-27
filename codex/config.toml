@@ -3,7 +3,7 @@ model_reasoning_effort = "high"
 personality = "pragmatic"
 check_for_updates_on_startup = true
 
-[projects."/Users/teodor.raykov/dev/redis/Redis-Enterprise"]
+[projects."~/dev/redis/Redis-Enterprise"]
 trust_level = "trusted"
 
 [features]
