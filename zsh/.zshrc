@@ -126,3 +126,11 @@ complete -C '/opt/homebrew/bin/aws_completer' aws
 export LUA_PATH='/opt/homebrew/Cellar/luarocks/3.12.2/share/lua/5.1/?.lua;/opt/homebrew/share/lua/5.1/?.lua;/opt/homebrew/share/lua/5.1/?/init.lua;/opt/homebrew/lib/lua/5.1/?.lua;/opt/homebrew/lib/lua/5.1/?/init.lua;./?.lua;./?/init.lua;/Users/teodor.raykov/.luarocks/share/lua/5.1/?.lua;/Users/teodor.raykov/.luarocks/share/lua/5.1/?/init.lua'
 export LUA_CPATH='/opt/homebrew/lib/lua/5.1/?.so;/opt/homebrew/lib/lua/5.1/loadall.so;./?.so;/Users/teodor.raykov/.luarocks/lib/lua/5.1/?.so'
 export PATH=$HOME/.luarocks/bin:$PATH
+
+# pnpm
+export PNPM_HOME="/Users/teodor.raykov/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end

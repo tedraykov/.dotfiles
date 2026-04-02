@@ -1,6 +1,5 @@
 model = "gpt-5.3-codex"
 model_reasoning_effort = "high"
-personality = "pragmatic"
 check_for_updates_on_startup = true
 
 [projects."~/dev/redis/Redis-Enterprise"]
@@ -8,12 +7,3 @@ trust_level = "trusted"
 
 [features]
 voice_transcription = true
-
-[mcp_servers.codebase-retrieval]
-command = "auggie"
-args = ["--mcp", "--mcp-auto-workspace"]
-
-[mcp_servers.playwright]
-command = "npx"
-args = ["@playwright/mcp@latest"]
-env_vars = ["DISPLAY", "WAYLAND_DISPLAY", "XAUTHORITY", "XDG_RUNTIME_DIR"]

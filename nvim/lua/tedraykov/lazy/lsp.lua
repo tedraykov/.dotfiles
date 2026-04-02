@@ -207,6 +207,8 @@ return {
 				"eslint_d",
 				"flake8",
 				"goimports",
+				"black",
+				"mypy",
 			},
 		})
 

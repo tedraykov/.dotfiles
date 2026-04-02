@@ -70,6 +70,7 @@ return {
 				-- null_ls.builtins.formatting.isort,
 				null_ls.builtins.formatting.black.with({
 					extra_args = { "--line-length", "120" },
+					timeout = 5000,
 				}),
 				-- JavaScript
 				require("none-ls.diagnostics.eslint_d").with({
