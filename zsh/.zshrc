@@ -78,15 +78,18 @@ alias python="python3"
 # go
 export GVM_ROOT="$HOME/.gvm"
 
+if [[ -s "$GVM_ROOT/environments/default" ]]; then
+  source "$GVM_ROOT/environments/default"
+  hash -r 2>/dev/null
+fi
+
 _load_gvm() {
-  unset -f gvm go gofmt
+  unset -f gvm
   [[ -s "$GVM_ROOT/scripts/gvm" ]] && source "$GVM_ROOT/scripts/gvm"
   hash -r 2>/dev/null
 }
 
-gvm()   { _load_gvm; gvm "$@"; }
-go()    { _load_gvm; go "$@"; }
-gofmt() { _load_gvm; gofmt "$@"; }
+gvm() { _load_gvm; gvm "$@"; }
 
 # Ruby
 export LDFLAGS="-L/opt/homebrew/opt/openblas/lib"
