@@ -1,0 +1,9 @@
+[MD013]
+line-length = 120
+reflow = true
+reflow-mode = "default"
+paragraphs = true
+blockquotes = true
+headings = false
+code-blocks = false
+tables = false

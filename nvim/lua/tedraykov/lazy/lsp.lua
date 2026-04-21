@@ -8,10 +8,22 @@ return {
 	},
 	config = function()
 		local cmp_nvim_lsp = require("cmp_nvim_lsp")
+		local harper_dict = vim.fs.normalize(vim.fn.expand("~/.config/harper-ls/dictionary.txt"))
+		local rumdl_config = vim.fn.stdpath("config") .. "/rumdl.toml"
 
 		vim.api.nvim_create_autocmd("LspAttach", {
 			group = vim.api.nvim_create_augroup("UserLspConfig", {}),
 			callback = function(ev)
+				local client = vim.lsp.get_client_by_id(ev.data.client_id)
+
+				if client and client.name == "harper_ls" then
+					local namespace = vim.lsp.diagnostic.get_namespace(client.id)
+					vim.diagnostic.config({
+						virtual_text = false,
+						underline = true,
+					}, namespace)
+				end
+
 				-- Buffer local mappings.
 				-- See `:help vim.lsp.*` for documentation on any of the below functions
 				local opts = { buffer = ev.buf, silent = true, nowait = true }
@@ -78,6 +90,7 @@ return {
 				"harper_ls",
 				"html",
 				"cssls",
+				"pyright",
 				"tailwindcss",
 				"svelte",
 				"lua_ls",
@@ -89,10 +102,10 @@ return {
 				"dockerls",
 				"gopls",
 				"helm_ls",
+				"rumdl",
 				"terraformls",
 				"yamlls",
 				"jinja_lsp",
-				"pyright",
 			},
 		})
 
@@ -138,6 +151,7 @@ return {
 		vim.lsp.config("harper_ls", {
 			settings = {
 				["harper-ls"] = {
+					userDictPath = harper_dict,
 					linters = {
 						SpellCheck = true,
 						SpelledNumbers = false,
@@ -198,6 +212,10 @@ return {
 			},
 		})
 
+		vim.lsp.config("rumdl", {
+			cmd = { "rumdl", "server", "--config", rumdl_config },
+		})
+
 		require("mason-tool-installer").setup({
 			ensure_installed = {
 				"prettierd",
@@ -209,6 +227,9 @@ return {
 				"goimports",
 				"black",
 				"mypy",
+			},
+			integrations = {
+				["mason-lspconfig"] = false,
 			},
 		})
 

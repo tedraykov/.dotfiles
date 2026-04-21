@@ -77,6 +77,7 @@ alias python="python3"
 
 # go
 export GVM_ROOT="$HOME/.gvm"
+export GOENV_DIR="$GVM_ROOT/gos/go1.25.7"
 
 if [[ -s "$GVM_ROOT/environments/default" ]]; then
   source "$GVM_ROOT/environments/default"

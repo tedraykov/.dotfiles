@@ -13,6 +13,7 @@
       - { src: "zsh/.zshrc", dest: "{{ home }}/.zshrc" }
       - { src: "tmux/tmux-attach", dest: "{{ home }}/.local/bin/tmux-attach" }
       - { src: "tmux/tmux-sessionizer", dest: "{{ home }}/.local/bin/tmux-sessionizer" }
+      - { src: "harper/dictionary.txt", dest: "{{ home }}/.config/harper-ls/dictionary.txt" }
       - { src: "aerospace/.aerospace.toml", dest: "{{ home }}/.aerospace.toml", os: "Darwin" }
       - { src: "iterm", dest: "{{ home }}/.config/iterm", os: "Darwin" }
       - { src: "iterm/profile.json", dest: "{{ home }}/Library/Application Support/iTerm2/DynamicProfiles/profile.json", os: "Darwin" }
