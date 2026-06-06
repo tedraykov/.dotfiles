@@ -22,6 +22,48 @@
     # ==========================================
     # 1. OS-Specific Package Management
     # ==========================================
+    - name: Ubuntu | Install gpg for apt key management
+      become: true
+      ansible.builtin.apt:
+        name: gpg
+        state: present
+        update_cache: yes
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Ubuntu | Create apt keyrings directory
+      become: true
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Ubuntu | Add eza GPG key
+      become: true
+      ansible.builtin.shell: |
+        wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
+      args:
+        creates: /etc/apt/keyrings/gierens.gpg
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Ubuntu | Add eza apt repository
+      become: true
+      ansible.builtin.copy:
+        content: "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main\n"
+        dest: /etc/apt/sources.list.d/gierens.list
+        mode: '0644'
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Ubuntu | Set correct permissions on eza keyring files
+      become: true
+      ansible.builtin.file:
+        path: "{{ item }}"
+        mode: '0644'
+      loop:
+        - /etc/apt/keyrings/gierens.gpg
+        - /etc/apt/sources.list.d/gierens.list
+      when: ansible_facts['os_family'] == "Debian"
+
     - name: Ubuntu | Install packages and build dependencies
       become: true
       ansible.builtin.apt:
