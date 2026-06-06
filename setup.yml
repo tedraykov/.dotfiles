@@ -253,6 +253,15 @@
       loop: "{{ dotfiles }}"
       when: item.os is undefined or item.os == ansible_facts['os_family']
 
+    - name: Remove existing directories that would block symlinking
+      ansible.builtin.shell: |
+        if [ -d "{{ item.dest }}" ] && [ ! -L "{{ item.dest }}" ]; then
+          rm -rf "{{ item.dest }}"
+        fi
+      loop: "{{ dotfiles }}"
+      when: item.os is undefined or item.os == ansible_facts['os_family']
+      changed_when: false
+
     - name: Symlink dotfiles
       ansible.builtin.file:
         src: "{{ playbook_dir }}/{{ item.src }}"
