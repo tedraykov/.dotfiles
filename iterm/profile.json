@@ -2,8 +2,8 @@
   "Profiles" : [
     {
       "Use Separate Colors for Light and Dark Mode" : true,
-      "Name" : "Default",
       "Rewritable" : true,
+      "Name" : "Ted's Profile",
       "Guid" : "E4599F82-A3BF-4BDF-AAA1-38B1F03C7B13",
       "Window Type" : 0
     }

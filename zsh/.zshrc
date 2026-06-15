@@ -100,8 +100,19 @@ export PATH=$GEM_HOME/bin:$PATH
 # eval "$(rbenv init -)"
 
 # java
-export PATH="$HOME/.jenv/bin:$PATH"
-# eval "$(jenv init -)"
+export PATH="$HOME/.jenv/bin:$HOME/.jenv/shims:$PATH"
+
+if [[ -r "$HOME/.jenv/version" ]]; then
+  export JAVA_HOME="$HOME/.jenv/versions/$(<$HOME/.jenv/version)"
+fi
+
+_load_jenv() {
+  unset -f jenv
+  eval "$(jenv init -)"
+  hash -r 2>/dev/null
+}
+
+jenv() { _load_jenv; jenv "$@"; }
 
 # javascript
 export NVM_LAZY_LOAD=true

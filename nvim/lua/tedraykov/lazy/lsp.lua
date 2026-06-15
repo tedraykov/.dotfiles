@@ -82,6 +82,15 @@ return {
 
 		local capabilities = cmp_nvim_lsp.default_capabilities()
 
+		vim.lsp.config("gopls", {
+			capabilities = capabilities,
+			settings = {
+				gopls = {
+					buildFlags = { "-tags=component" },
+				},
+			},
+		})
+
 		require("mason").setup()
 		require("mason-lspconfig").setup({
 			automatic_enable = true,
