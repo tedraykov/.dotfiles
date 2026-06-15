@@ -46,6 +46,13 @@ elif command -v batcat >/dev/null 2>&1; then
   alias cat='batcat --paging=never'
 fi
 
+if command -v codex >/dev/null 2>&1; then
+  alias co='codex --yolo'
+fi
+if command -v claude >/dev/null 2>&1; then
+  alias cl='claude --dangerously-skip-permissions'
+fi
+
 bindkey -s ^f "tmux-sessionizer\n"
 bindkey -s ^t "tmux-attach\n"
 bindkey -s ^w "exit\n"
