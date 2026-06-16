@@ -226,10 +226,10 @@
     - name: Install Go (via GVM) and set as default
       ansible.builtin.shell: |
         source "{{ home }}/.gvm/scripts/gvm"
-        gvm install go1.25.7 -B
-        gvm use go1.25.7 --default
+        gvm install go1.26.3 -B
+        gvm use go1.26.3 --default
       args:
-        creates: "{{ home }}/.gvm/gos/go1.25.7/bin/go"
+        creates: "{{ home }}/.gvm/gos/go1.26.3/bin/go"
         executable: /bin/bash
 
     - name: Install Rust via rustup
