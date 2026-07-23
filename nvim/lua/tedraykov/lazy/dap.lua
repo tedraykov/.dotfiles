@@ -53,25 +53,54 @@ return {
 			-- ============================================================
 			-- HELPER FUNCTIONS
 			-- ============================================================
-			-- Helper: prefer git root as local project root when available
+			-- Find the Python project for the current buffer.  The Git root is not
+			-- sufficient here because this repository is a monorepo and contains both
+			-- Poetry projects and legacy setup.py/pytest.ini projects.
 			local function project_root()
-				local git = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
-				if git and #git > 0 and vim.v.shell_error == 0 then
-					return git
+				local file = vim.api.nvim_buf_get_name(0)
+				local dir = file ~= "" and vim.fs.dirname(file) or vim.fn.getcwd()
+				local current = vim.fs.normalize(dir)
+
+				while current and current ~= "" do
+					if
+						vim.uv.fs_stat(current .. "/pyproject.toml")
+						or vim.uv.fs_stat(current .. "/setup.py")
+						or vim.uv.fs_stat(current .. "/pytest.ini")
+					then
+						return current
+					end
+
+					local parent = vim.fs.dirname(current)
+					if parent == current then
+						break
+					end
+					current = parent
 				end
+
 				return vim.fn.getcwd()
 			end
 
 			local function poetry_python()
-				-- falls back to "python" if Poetry not available
-				local ok, venv_path = pcall(function()
-					return vim.fn.systemlist("poetry env info -p")[1]
-				end)
-				if ok and venv_path and #venv_path > 0 then
-					local sep = package.config:sub(1, 1) == "\\" and "\\" or "/"
+				local root = project_root()
+				local sep = package.config:sub(1, 1) == "\\" and "\\" or "/"
+				local local_python = root .. sep .. ".venv" .. sep .. "bin" .. sep .. "python"
+				if vim.uv.fs_stat(local_python) then
+					return local_python
+				end
+
+				local venv_path = vim.fn.systemlist({ "poetry", "-C", root, "env", "info", "-p" })[1]
+				if vim.v.shell_error == 0 and venv_path and #venv_path > 0 then
 					return venv_path .. sep .. "bin" .. sep .. "python"
 				end
 				return "python"
+			end
+
+			local function python_test_config()
+				local root = project_root()
+				return {
+					cwd = root,
+					pythonPath = poetry_python(),
+				}
 			end
 
 			-- ============================================================
@@ -152,7 +181,12 @@ return {
 			-- ============================================================
 			-- PYTHON SETUP
 			-- ============================================================
-			dap_python.setup(poetry_python())
+			-- Keep the DAP adapter separate from the project interpreter.  This project
+			-- contains the obsolete `typing` backport, which shadows Python 3.11's
+			-- stdlib typing module when debugpy is launched from the Poetry venv.
+			-- The test process itself still uses the project interpreter below.
+			dap_python.resolve_python = poetry_python
+			dap_python.setup("debugpy-adapter")
 			table.insert(require("dap").configurations.python, {
 				justMyCode = false,
 			})
@@ -278,7 +312,7 @@ return {
 				dapui.open()
 				dapui.float_element("console", { enter = true })
 				if ft == "python" then
-					require("dap-python").test_method()
+					require("dap-python").test_method({ config = python_test_config() })
 				elseif ft == "go" then
 					require("dap-go").debug_test()
 				else
@@ -291,7 +325,7 @@ return {
 				dapui.open()
 				dapui.float_element("console", { enter = true })
 				if ft == "python" then
-					require("dap-python").test_class()
+					require("dap-python").test_class({ config = python_test_config() })
 				elseif ft == "go" then
 					require("dap-go").debug_test()
 				else
@@ -304,7 +338,7 @@ return {
 				dapui.open()
 				dapui.float_element("console", { enter = true })
 				if ft == "python" then
-					require("dap-python").test_method()
+					require("dap-python").test_method({ config = python_test_config() })
 				elseif ft == "go" then
 					require("dap-go").debug_last_test()
 				else

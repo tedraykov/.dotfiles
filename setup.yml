@@ -17,6 +17,7 @@
       - { src: "aerospace/.aerospace.toml", dest: "{{ home }}/.aerospace.toml", os: "Darwin" }
       - { src: "iterm", dest: "{{ home }}/.config/iterm", os: "Darwin" }
       - { src: "iterm/profile.json", dest: "{{ home }}/Library/Application Support/iTerm2/DynamicProfiles/profile.json", os: "Darwin" }
+      - { src: "swiftbar/Plugins", dest: "{{ home }}/Library/Application Support/SwiftBar/Plugins", os: "Darwin" }
 
   tasks:
     # ==========================================
@@ -122,6 +123,7 @@
           - fzf
           - neovim
           - pyenv
+          - jenv
           - eza
           - bat
           - tmux
@@ -212,10 +214,11 @@
       args:
         executable: /bin/bash
 
-    - name: Clone Jenv
+    - name: Linux | Clone Jenv
       ansible.builtin.git:
         repo: 'https://github.com/jenv/jenv.git'
         dest: "{{ home }}/.jenv"
+      when: ansible_facts['os_family'] == "Debian"
 
     - name: Install GVM (Go Version Manager)
       ansible.builtin.shell: bash < <(curl -s -S -L https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer)
