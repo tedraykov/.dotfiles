@@ -128,6 +128,7 @@
           - bat
           - tmux
           - bison
+          - tree-sitter-cli
         state: present
         update_homebrew: yes
       when: ansible_facts['os_family'] == "Darwin"

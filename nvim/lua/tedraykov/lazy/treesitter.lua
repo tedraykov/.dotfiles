@@ -3,6 +3,14 @@ return {
 	branch = "master",
 	build = ":TSUpdate",
 	config = function()
+		-- Tree-sitter CLI 0.26 removed the --no-bindings generate flag that this
+		-- nvim-treesitter branch still passes by default.
+		require("nvim-treesitter.install").ts_generate_args = {
+			"generate",
+			"--abi",
+			vim.treesitter.language_version,
+		}
+
 		require("nvim-treesitter.configs").setup({
 			-- A list of parser names, or "all"
 			ensure_installed = {
@@ -14,6 +22,7 @@ return {
 				"c",
 				"lua",
 				"rust",
+				"swift",
 				"jsdoc",
 				"bash",
 				"markdown_inline",

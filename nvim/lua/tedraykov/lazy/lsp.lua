@@ -122,6 +122,9 @@ return {
 			capabilities = capabilities,
 		})
 
+		-- sourcekit-lsp is provided by Xcode/the Swift toolchain, not Mason.
+		vim.lsp.enable("sourcekit")
+
 		vim.lsp.config("ts_ls", {
 			handlers = {
 				["textDocument/publishDiagnostics"] = function(_, result, ctx)
