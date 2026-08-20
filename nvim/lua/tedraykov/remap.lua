@@ -65,8 +65,27 @@ vim.api.nvim_create_user_command("OpenFinder", OpenInFinder, {})
 
 vim.keymap.set("n", "<leader>of", ":OpenFinder<CR>")
 
-vim.keymap.set("n", "<leader>cp", function()
-	local path = vim.fn.expand("%:p")
+local function copy_path(path)
 	vim.fn.setreg("+", path)
 	print("Copied: " .. path)
+end
+
+vim.keymap.set("n", "<leader>cp", function()
+	local path = vim.fn.expand("%:p")
+	local session_path
+
+	if vim.env.TMUX then
+		local result = vim.system({ "tmux", "display-message", "-p", "-F", "#{session_path}" }, { text = true }):wait()
+		if result.code == 0 then
+			session_path = vim.trim(result.stdout)
+		end
+	end
+
+	local relative_path = vim.fs.relpath(session_path or vim.fn.getcwd(), path)
+	copy_path(relative_path or path)
+end, { desc = "Copy path relative to tmux session to clipboard" })
+
+vim.keymap.set("n", "<leader>cP", function()
+	local path = vim.fn.expand("%:p")
+	copy_path(path)
 end, { desc = "Copy full path to clipboard" })
