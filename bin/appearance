@@ -1,0 +1,144 @@
+#!/usr/bin/env bash
+# Explicit light/dark switch for the terminal environment.
+#
+# The chosen appearance is stored in ~/.config/appearance; nvim, tmux,
+# powerlevel10k and iTerm2 all read that file, so nothing here follows the
+# macOS system appearance.
+
+set -euo pipefail
+
+state_file="${APPEARANCE_STATE_FILE:-$HOME/.config/appearance}"
+default_appearance="dark"
+
+# Resolve the repo this script lives in, even when invoked through the
+# ~/.local/bin symlink, so the iTerm2 profile template can be found.
+script_path="$0"
+while [ -L "$script_path" ]; do
+    link="$(readlink "$script_path")"
+    case "$link" in
+        /*) script_path="$link" ;;
+        *) script_path="$(dirname "$script_path")/$link" ;;
+    esac
+done
+repo_root="$(cd "$(dirname "$script_path")/.." && pwd)"
+
+usage() {
+    cat <<'EOF'
+usage: appearance [dark|light|toggle|apply|status]
+
+  dark | light  switch to that appearance
+  toggle        switch to the other appearance
+  apply         re-apply the stored appearance (default)
+  status        print the stored appearance
+EOF
+}
+
+current_appearance() {
+    local value=""
+    [ -r "$state_file" ] && value="$(tr -d '[:space:]' < "$state_file")"
+    case "$value" in
+        light | dark) printf '%s\n' "$value" ;;
+        *) printf '%s\n' "$default_appearance" ;;
+    esac
+}
+
+# Written through a temporary file so a concurrent reader never sees it empty.
+store_appearance() {
+    mkdir -p "$(dirname "$state_file")"
+    printf '%s\n' "$1" > "$state_file.tmp"
+    mv -f "$state_file.tmp" "$state_file"
+}
+
+# Reload the config so the palette guarded by the state file is re-evaluated.
+apply_tmux() {
+    command -v tmux > /dev/null 2>&1 || return 0
+    tmux list-sessions > /dev/null 2>&1 || return 0
+    tmux source-file "$HOME/.tmux.conf" > /dev/null 2>&1 || true
+}
+
+# Running instances re-read the state file from their SIGUSR1 autocmd.
+apply_nvim() {
+    command -v pkill > /dev/null 2>&1 || return 0
+    pkill -USR1 -x nvim > /dev/null 2>&1 || true
+}
+
+# Flatten the profile template's light or dark color set into the plain color
+# keys and turn iTerm2's own light/dark switching off. iTerm2 picks the
+# rewritten dynamic profile up immediately, including in open sessions.
+apply_iterm() {
+    [ "$(uname -s)" = "Darwin" ] || return 0
+
+    local template="$repo_root/iterm/profile.json"
+    local dest_dir="$HOME/Library/Application Support/iTerm2/DynamicProfiles"
+    [ -r "$template" ] || return 0
+    [ -d "$dest_dir" ] || return 0
+
+    if ! command -v python3 > /dev/null 2>&1; then
+        echo "appearance: python3 not found, skipping the iTerm2 profile" >&2
+        return 0
+    fi
+
+    python3 - "$1" "$template" "$dest_dir/profile.json" <<'PYTHON'
+import json
+import os
+import sys
+
+appearance, template, dest = sys.argv[1:4]
+suffix = " (Light)" if appearance == "light" else " (Dark)"
+image = "background-light.png" if appearance == "light" else "background-transparent.png"
+
+with open(template) as handle:
+    document = json.load(handle)
+
+for profile in document.get("Profiles", []):
+    for key in list(profile):
+        if key.endswith(suffix):
+            profile[key[: -len(suffix)]] = profile[key]
+    profile["Use Separate Colors for Light and Dark Mode"] = False
+    profile["Background Image Location"] = "~/.config/iterm/images/" + image
+
+# Written as a dotfile first so iTerm2 never reads a half-written profile.
+tmp = os.path.join(os.path.dirname(dest), ".%s.tmp" % os.path.basename(dest))
+with open(tmp, "w") as handle:
+    json.dump(document, handle, indent=2)
+    handle.write("\n")
+os.replace(tmp, dest)
+PYTHON
+}
+
+apply_appearance() {
+    apply_tmux
+    apply_nvim
+    apply_iterm "$1"
+}
+
+case "${1:-apply}" in
+    dark | light)
+        store_appearance "$1"
+        apply_appearance "$1"
+        ;;
+    toggle)
+        if [ "$(current_appearance)" = "dark" ]; then
+            target="light"
+        else
+            target="dark"
+        fi
+        store_appearance "$target"
+        apply_appearance "$target"
+        ;;
+    apply)
+        appearance="$(current_appearance)"
+        store_appearance "$appearance"
+        apply_appearance "$appearance"
+        ;;
+    status)
+        current_appearance
+        ;;
+    -h | --help | help)
+        usage
+        ;;
+    *)
+        usage >&2
+        exit 1
+        ;;
+esac

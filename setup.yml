@@ -11,12 +11,13 @@
       - { src: "nvim", dest: "{{ home }}/.config/nvim" }
       - { src: "tmux/.tmux.conf", dest: "{{ home }}/.tmux.conf" }
       - { src: "zsh/.zshrc", dest: "{{ home }}/.zshrc" }
+      - { src: "zsh/.p10k-appearance.zsh", dest: "{{ home }}/.p10k-appearance.zsh" }
+      - { src: "bin/appearance", dest: "{{ home }}/.local/bin/appearance" }
       - { src: "tmux/tmux-attach", dest: "{{ home }}/.local/bin/tmux-attach" }
       - { src: "tmux/tmux-sessionizer", dest: "{{ home }}/.local/bin/tmux-sessionizer" }
       - { src: "harper/dictionary.txt", dest: "{{ home }}/.config/harper-ls/dictionary.txt" }
       - { src: "aerospace/.aerospace.toml", dest: "{{ home }}/.aerospace.toml", os: "Darwin" }
       - { src: "iterm", dest: "{{ home }}/.config/iterm", os: "Darwin" }
-      - { src: "iterm/profile.json", dest: "{{ home }}/Library/Application Support/iTerm2/DynamicProfiles/profile.json", os: "Darwin" }
       - { src: "swiftbar/Plugins", dest: "{{ home }}/Library/Application Support/SwiftBar/Plugins", os: "Darwin" }
 
   tasks:
@@ -133,13 +134,21 @@
         update_homebrew: yes
       when: ansible_facts['os_family'] == "Darwin"
 
+    # Homebrew now prefixes the cask token to its "already an App at ..." error,
+    # which homebrew_cask's accept_external_apps no longer recognises. Skip the
+    # install when the app is already in /Applications instead.
+    - name: macOS | Check for an existing iTerm2 installation
+      ansible.builtin.stat:
+        path: /Applications/iTerm.app
+      register: iterm_app
+      when: ansible_facts['os_family'] == "Darwin"
+
     - name: macOS | Install GUI Applications (Casks)
       community.general.homebrew_cask:
         name:
           - iterm2
         state: present
-        accept_external_apps: yes
-      when: ansible_facts['os_family'] == "Darwin"
+      when: ansible_facts['os_family'] == "Darwin" and not iterm_app.stat.exists
 
     - name: macOS | Run fzf install script
       ansible.builtin.command: "$(brew --prefix)/opt/fzf/install --all --no-bash --no-fish"
@@ -284,3 +293,16 @@
         TMUX_PLUGIN_MANAGER_PATH: "{{ home }}/.tmux/plugins/"
       args:
         creates: "{{ home }}/.tmux/plugins/tmux"
+
+    - name: macOS | Ensure the iTerm2 DynamicProfiles directory exists
+      ansible.builtin.file:
+        path: "{{ home }}/Library/Application Support/iTerm2/DynamicProfiles"
+        state: directory
+        mode: '0755'
+      when: ansible_facts['os_family'] == "Darwin"
+
+    # Renders iterm/profile.json for the stored appearance (dark by default),
+    # so the iTerm2 profile never follows the macOS system appearance.
+    - name: Apply the stored light/dark appearance
+      ansible.builtin.command: "{{ home }}/.local/bin/appearance apply"
+      changed_when: false
