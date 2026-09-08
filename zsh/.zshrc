@@ -50,7 +50,10 @@ if command -v codex >/dev/null 2>&1; then
   alias co='codex --yolo'
 fi
 if command -v claude >/dev/null 2>&1; then
+  # work account (default ~/.claude config dir)
   alias cl='claude --dangerously-skip-permissions'
+  # personal account (separate config dir => separate login, settings, history)
+  alias clp='CLAUDE_CONFIG_DIR="$HOME/.claude-personal" claude --dangerously-skip-permissions'
 fi
 
 bindkey -s ^f "tmux-sessionizer\n"

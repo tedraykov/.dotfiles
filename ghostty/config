@@ -1,0 +1,42 @@
+# Ghostty configuration, matching the iTerm2 profile in iterm/profile.json.
+#
+# The palette lives in themes/ted-dark and themes/ted-light. Which of the two
+# is active is not taken from the macOS system appearance: `appearance
+# dark|light` writes the generated `appearance` file included below, the same
+# way it rewrites the iTerm2 dynamic profile.
+
+font-family = MesloLGS NF
+font-size = 17
+# "ASCII Ligatures = false" in the iTerm2 profile.
+font-feature = -calt
+font-feature = -liga
+font-feature = -dlig
+
+# Transparency 0.02 and a 20pt blur in the iTerm2 profile.
+background-opacity = 0.98
+background-blur = 20
+background-image-fit = stretch
+background-image-position = center
+
+window-padding-x = 8
+window-padding-y = 10
+
+# No titlebar and no close/minimise/zoom buttons. Unlike `window-decoration =
+# none` this keeps the window frame and its rounded corners; the cost is that
+# the window can only be dragged with option+click, which AeroSpace makes moot.
+macos-titlebar-style = hidden
+
+cursor-style = block
+cursor-style-blink = false
+
+# "Use Bright Bold" in the iTerm2 profile.
+bold-color = bright
+
+# "Silence Bell" plus a visual bell in the iTerm2 profile.
+bell-features = attention,title
+
+# The dark appearance, used until `appearance` has been generated. The include
+# comes last so the generated file wins.
+theme = ted-dark
+background-image = images/background-transparent.png
+config-file = ?appearance

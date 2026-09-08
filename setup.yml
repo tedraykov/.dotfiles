@@ -18,6 +18,7 @@
       - { src: "harper/dictionary.txt", dest: "{{ home }}/.config/harper-ls/dictionary.txt" }
       - { src: "aerospace/.aerospace.toml", dest: "{{ home }}/.aerospace.toml", os: "Darwin" }
       - { src: "iterm", dest: "{{ home }}/.config/iterm", os: "Darwin" }
+      - { src: "ghostty", dest: "{{ home }}/.config/ghostty", os: "Darwin" }
       - { src: "swiftbar/Plugins", dest: "{{ home }}/Library/Application Support/SwiftBar/Plugins", os: "Darwin" }
 
   tasks:
@@ -143,12 +144,25 @@
       register: iterm_app
       when: ansible_facts['os_family'] == "Darwin"
 
+    - name: macOS | Check for an existing Ghostty installation
+      ansible.builtin.stat:
+        path: /Applications/Ghostty.app
+      register: ghostty_app
+      when: ansible_facts['os_family'] == "Darwin"
+
     - name: macOS | Install GUI Applications (Casks)
       community.general.homebrew_cask:
         name:
           - iterm2
         state: present
       when: ansible_facts['os_family'] == "Darwin" and not iterm_app.stat.exists
+
+    - name: macOS | Install Ghostty
+      community.general.homebrew_cask:
+        name:
+          - ghostty
+        state: present
+      when: ansible_facts['os_family'] == "Darwin" and not ghostty_app.stat.exists
 
     - name: macOS | Run fzf install script
       ansible.builtin.command: "$(brew --prefix)/opt/fzf/install --all --no-bash --no-fish"
@@ -301,8 +315,9 @@
         mode: '0755'
       when: ansible_facts['os_family'] == "Darwin"
 
-    # Renders iterm/profile.json for the stored appearance (dark by default),
-    # so the iTerm2 profile never follows the macOS system appearance.
+    # Renders iterm/profile.json and ghostty/appearance for the stored
+    # appearance (dark by default), so neither terminal follows the macOS
+    # system appearance.
     - name: Apply the stored light/dark appearance
       ansible.builtin.command: "{{ home }}/.local/bin/appearance apply"
       changed_when: false
